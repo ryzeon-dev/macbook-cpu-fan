@@ -1,4 +1,4 @@
-#![allow(non_snake_case, dead_code, unused_variables)]
+#![allow(non_snake_case, unused_must_use)]
 
 use rsjson;
 
@@ -39,6 +39,7 @@ impl Configuration {
     }
 }
 
+#[derive(Debug)]
 struct Fan {
     fan: String,
     min: usize,
@@ -47,10 +48,17 @@ struct Fan {
 
 impl Fan {
     fn setSpeedRpm(&self, rpm: usize) -> bool {
-        let pipe = std::process::Command::new("/bin/sh").arg(format!("sudo chmod 666 {}/{}", DRIVER_DIR, self.fan));
+       std::process::Command::new("/bin/sh").arg(format!("sudo chmod 666 {}/{}", DRIVER_DIR, self.fan));
+
+        let enabler: String = {
+            let tmp = self.fan.split("_");
+            let collected = tmp.collect::<Vec<&str>>();
+            collected.get(0).unwrap().to_string()
+        };
+        std::fs::write(format!("{}_manual", enabler), "1");
 
         match std::fs::write(&self.fan, format!("{}", rpm)) {
-            Err(why) => {
+            Err(_) => {
                 return false
             },
             Ok(_) => {
@@ -112,6 +120,10 @@ impl Fans {
     fn setSpeedPercent(&self, percent: usize) {
         for fan in &self.fans {
             let status = fan.setSpeedPercent(percent);
+            
+            if !status {
+                println!("problem setting speed for {:?}", fan);
+            }
         }
     }
 }
