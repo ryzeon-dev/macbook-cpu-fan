@@ -66,6 +66,10 @@ if __name__ == '__main__':
         rootCheck()
         os.system('systemctl disable macbook-cpu-fan')
 
+    elif 'status' in args:
+        rootCheck()
+        os.system('systemctl status macbook-cpu-fan')
+
     else:
         fans = terminal('ls /sys/devices/platform/applesmc.768/ | grep "_output"').split('\n')
         
