@@ -1,0 +1,10 @@
+[Unit]
+Description=MacBook CPU Fan controller daemon
+
+[Service]
+ExecStart=/etc/macbook-cpu-fan/daemon
+Type=simple
+Restart=unless-stopped
+
+[Install]
+WantedBy=default.target

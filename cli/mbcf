@@ -1,0 +1,81 @@
+#!/usr/bin/python3
+
+import os
+from subprocess import getoutput as terminal
+import sys
+
+def rootCheck():
+    if terminal('whoami') != 'root':
+        print('Must execute as root', file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    
+    if '-h' in args or '--help' in args:
+        print('mbcf: MacBook CPU fan cotroller CLI')
+        print('usage: mbcf [ARGUMENTS] [OPTIONS]')
+        print('\nArguments:')
+        print('    start | restart | stop | enable | disable    performs the specified command on the service using "systemctl" (requires root)')
+        print('\nOptions:')
+        print('    -a | --apply CONFIG_NAME    restarts the daemon applying the specified fan profile (requires root)')
+        print('    -h | --help                 show this message and exit')
+        sys.exit(0)
+
+    if '-a' in args or '--apply' in args:
+        rootCheck()
+
+        try:
+            index = args.index('-a') + 1
+        except:
+            index = args.index('--apply') + 1
+
+        confName = args[index]
+        configs = os.listdir('/etc/macbook-cpu-fan/conf')
+        
+        if '.json' not in confName:
+            confName += '.json'
+
+        
+        if confName not in configs:
+            print(f'Error: configuration "{confName}" not found', file=sys.stderr)	
+            sys.exit(1)	
+
+        with open('/etc/macbook-cpu-fan/conf.txt', 'w') as file:
+            file.write(confName)
+
+        os.system('systemctl restart macbook-cpu-fan')
+    
+    elif 'start' in args:
+        rootCheck()
+        os.system('systemctl start macbook-cpu-fan')
+
+    elif 'stop' in args:
+        rootCheck()
+        os.system('systemctl stop macbook-cpu-fan')
+
+    elif 'restart' in args:
+        rootCheck()
+        os.system('systemctl restart macbook-cpu-fan')
+
+    elif 'enable' in args:
+        rootCheck()
+        os.system('systemctl enable macbook-cpu-fan')
+
+    elif 'disable' in args:
+        rootCheck()
+        os.system('systemctl disable macbook-cpu-fan')
+
+    else:
+        fans = terminal('ls /sys/devices/platform/applesmc.768/ | grep "_output"').split('\n')
+        
+        for fan in fans:
+            print(f'{fan.split("_")[0]} speed: ' + terminal('cat /sys/devices/platform/applesmc.768/' + fan) + ' rpm')
+            print(f'\tmax: ' + terminal('cat /sys/devices/platform/applesmc.768/' + fan.split('_')[0] + '_max'))
+            print(f'\tmin: ' + terminal('cat /sys/devices/platform/applesmc.768/' + fan.split('_')[0] + '_min'))
+        
+        print('Currently active configuration: ' + terminal('cat /etc/macbook-cpu-fan/conf.txt'))
+        print('Configuration file content:')
+        
+        with open('/etc/macbook-cpu-fan/conf/' + terminal('cat /etc/macbook-cpu-fan/conf.txt'), 'r') as config:
+            print(config.read().replace('\t', '    '))
