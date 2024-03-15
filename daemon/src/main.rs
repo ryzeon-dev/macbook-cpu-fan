@@ -55,7 +55,12 @@ impl Fan {
             let collected = tmp.collect::<Vec<&str>>();
             collected.get(0).unwrap().to_string()
         };
-        std::fs::write(format!("{}_manual", enabler), "1");
+        match std::fs::write(format!("{}_manual", enabler), "1") {
+            Err(why) => {
+                println!("Failure enabling manual mode for {}: {:?}", self.fan, why);
+            },
+            Ok(_) => {}
+        }
 
         match std::fs::write(&self.fan, format!("{}", rpm)) {
             Err(_) => {
