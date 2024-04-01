@@ -71,6 +71,10 @@ if __name__ == '__main__':
         os.system('systemctl status macbook-cpu-fan')
 
     else:
+        currentTemp = terminal('cat /sys/class/thermal/thermal_zone1/temp')
+        currentTemp = int(currentTemp) / 1000
+        print(f'Current temperature: {currentTemp} C')
+
         fans = terminal('ls /sys/devices/platform/applesmc.768/ | grep "_output"').split('\n')
         
         for fan in fans:
