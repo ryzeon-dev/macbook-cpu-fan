@@ -18,6 +18,7 @@ if __name__ == '__main__':
         print('\nArguments:')
         print('    start | restart | stop | enable | disable    performs the specified command on the service using "systemctl" (requires root)')
         print('\nOptions:')
+        print('    -l | --list                 lists available configurations')
         print('    -a | --apply CONFIG_NAME    restarts the daemon applying the specified fan profile (requires root)')
         print('    -h | --help                 show this message and exit')
         sys.exit(0)
@@ -46,6 +47,9 @@ if __name__ == '__main__':
 
         os.system('systemctl restart macbook-cpu-fan')
     
+    elif '-l' in args or '--list' in args:
+        print(', '.join(os.listdir('/etc/macboock-cpu-fan/conf/')))
+
     elif 'start' in args:
         rootCheck()
         os.system('systemctl start macbook-cpu-fan')
