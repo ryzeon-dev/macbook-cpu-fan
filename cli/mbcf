@@ -48,7 +48,7 @@ if __name__ == '__main__':
         os.system('systemctl restart macbook-cpu-fan')
     
     elif '-l' in args or '--list' in args:
-        print(', '.join(os.listdir('/etc/macboock-cpu-fan/conf/')))
+        print(', '.join(os.listdir('/etc/macbook-cpu-fan/conf/')))
 
     elif 'start' in args:
         rootCheck()
