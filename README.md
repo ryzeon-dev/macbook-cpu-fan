@@ -31,6 +31,7 @@ Arguments:
     start | restart | stop | enable | disable    performs the specified command on the service using "systemctl" (requires root)
 
 Options:
+    -l | --list                 lists available configurations
     -a | --apply CONFIG_NAME    restarts the daemon applying the specified fan profile (requires root)
     -h | --help                 show this message and exit
 ```
